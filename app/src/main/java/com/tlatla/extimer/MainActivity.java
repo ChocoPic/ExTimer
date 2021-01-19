@@ -1,5 +1,7 @@
 package com.tlatla.extimer;
 
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -26,15 +28,21 @@ public class MainActivity extends AppCompatActivity {
     private String TITLE = "플랭크";
     private MyTimer myTimer;
 
+    private SoundPool soundPool;
+    private int sound;
+
     int time;
     int i;
     int count=1;
+    int interval;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
+        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        sound = soundPool.load(this, R.raw.bbb, 1);
 
         titleText = findViewById(R.id.titleText);
         countText = findViewById(R.id.countText);
@@ -51,10 +59,12 @@ public class MainActivity extends AppCompatActivity {
         TIME.add(1);
         COUNT = TIME.size();
         //
-        myTimer = new MyTimer(getTotalTime()*1000, 1000);
+        interval = (int)Math.round((COUNT+0.3)/2);
+
+        myTimer = new MyTimer((getTotalTime()+interval)*1000, 1000);
 
         titleText.setText(TITLE);
-        countText.setText(count +" / " + Math.round((COUNT+0.3)/2));
+        countText.setText(count +" / " + interval);
         timeText.setText(TIME.get(0) + "초");
         textView.setVisibility(View.INVISIBLE);
 
@@ -93,15 +103,16 @@ public class MainActivity extends AppCompatActivity {
             timeText.setText(time + "초");
             time--;
             try{
-                if(time==0){
+                if(time==-1){
                     i++;
                     time = TIME.get(i);
                     if(i%2==0){
                         count++;
-                        countText.setText(count +" / " + Math.round((COUNT+0.3)/2));
+                        countText.setText(count +" / " + interval);
                     }else {
                         Log.d("세트: ", count + ", 휴식");
                     }
+                    soundPool.play(sound, 1f,1f,0,0,1f);
                 }
             }catch (Exception e){
                 Log.d("상태 - ", "타이머 종료");
@@ -110,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onFinish() {
-            //textView.setVisibility(View.VISIBLE);
             timeText.setText("끝!");
         }
     }
