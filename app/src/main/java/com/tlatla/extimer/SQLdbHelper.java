@@ -67,7 +67,7 @@ public class SQLdbHelper extends SQLiteOpenHelper {
     //삭제
     public void deleteData(String data) {
         System.out.println("삭제하기 " + data);
-        long id = getID_fromData(data);
+        int id = getID_fromData(data);
         db.delete(TABLE_NAME, COLUMN_DATA + "=? and "
                 + COLUMN_ID + "=?", new String[]{data, String.valueOf(id)});
         Toast.makeText(context, "삭제되었습니다!", Toast.LENGTH_SHORT).show();
@@ -83,13 +83,13 @@ public class SQLdbHelper extends SQLiteOpenHelper {
         Toast.makeText(context, "수정되었습니다!", Toast.LENGTH_SHORT).show();
     }
 
-    public long getID_fromData(String data) {
+    public int getID_fromData(String data) {
         System.out.println("삭제 또는 수정할 내용은: " + data);
         Cursor cursor = db.query(TABLE_NAME, new String[]{COLUMN_ID}, COLUMN_DATA + "=?", new String[]{String.valueOf(data)}, null, null, null);
-        long id = 0;
+        int id = 0;
         while (cursor.moveToNext()) {
             int column = cursor.getColumnIndex(COLUMN_ID);
-            id = cursor.getLong(column);
+            id = cursor.getInt(column);
             System.out.println(data + " 의 id는 " + id);
         }
         cursor.close();

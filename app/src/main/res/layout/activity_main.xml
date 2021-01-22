@@ -1,89 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginStart="20dp"
-    android:layout_marginLeft="20dp"
-    android:layout_marginEnd="20dp"
-    android:layout_marginRight="20dp"
-    tools:context=".MainActivity">
+    android:background="#FFFFFF"
+    android:orientation="vertical">
 
-    <Button
-        android:id="@+id/listBtn"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="?android:attr/actionModeWebSearchDrawable"
-        app:backgroundTint="#000000"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="wrap_content"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="타이머이름"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@id/countText"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_gravity="fill_vertical"
+        android:layout_weight="1"
+        android:background="#8EBFD5">
 
-    <TextView
-        android:id="@+id/countText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="세트"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@id/textView"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titleText" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="다음"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@id/timeText"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/countText" />
-
-    <TextView
-        android:id="@+id/timeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:textSize="36sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    </androidx.recyclerview.widget.RecyclerView>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/add_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/timeText">
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/startBtn"
+        <EditText
+            android:id="@+id/title_editText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="20dp"
-            android:text="시작" />
+            android:ems="10"
+            android:hint="타이머 이름"
+            android:inputType="textPersonName" />
+
+        <LinearLayout
+            android:id="@+id/time_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/addTimerBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="타이머 추가"
+                app:backgroundTint="#D3D3D3" />
+
+            <Button
+                android:id="@+id/saveBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:text="저장" />
+        </LinearLayout>
 
     </LinearLayout>
 
+    <Button
+        android:id="@+id/newBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="새로 만들기" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

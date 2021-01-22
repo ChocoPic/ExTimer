@@ -1,156 +1,184 @@
 package com.tlatla.extimer;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
-import android.media.SoundPool;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.BufferedReader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    private final String FILE_NAME = "timer.list";
+    private RecyclerView recyclerView;
+    private Adapter adapter;
+    private ArrayList<String> titleList = new ArrayList<>();    //리사이클러뷰 출력용 (제목)
+    private ArrayList<ArrayList<String>> allList;  //파일 저장용 (제목+시간)
 
-    private TextView textView;
-    private TextView countText;
-    private TextView titleText;
-    private TextView timeText;
-    private Button startBtn;
-    private Button listBtn;
+    private Button newBtn;
+    private Button addTimerBtn;
+    private Button saveBtn;
+    private LinearLayout add_layout;
+    private TextView title_editText;
+    private LinearLayout time_layout;
+    private ArrayList<EditText> editTexts;
+    private SQLdbHelper helper;
 
-    private SharedPreferences pref;
-
-    private ArrayList<Integer> TIME = new ArrayList<>();
-    private int COUNT;
-    private String TITLE;
-    private MyTimer myTimer;
-
-    private SoundPool soundPool;
-    private int sound;
-
-    int time;
-    int i;
-    int count=1;
-    int interval;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-        sound = soundPool.load(this, R.raw.bbb, 1);
+        //뷰 세팅
+        recyclerView = findViewById(R.id.recyclerview);
+        add_layout = findViewById(R.id.add_layout);
+        newBtn = findViewById(R.id.newBtn);
+        addTimerBtn = findViewById(R.id.addTimerBtn);
+        saveBtn = findViewById(R.id.saveBtn);
+        title_editText = findViewById(R.id.title_editText);
+        time_layout = findViewById(R.id.time_layout);
+        add_layout.setVisibility(View.GONE);
 
-        titleText = findViewById(R.id.titleText);
-        countText = findViewById(R.id.countText);
-        textView = findViewById(R.id.textView);
-        timeText = findViewById(R.id.timeText);
-        startBtn = findViewById(R.id.startBtn);
-        listBtn = findViewById(R.id.listBtn);
-
-        pref = getSharedPreferences("Pref", MODE_PRIVATE);
-        initData();
-
-
-        COUNT = TIME.size();
-        interval = (int)Math.round((COUNT+0.3)/2);
-
-        myTimer = new MyTimer((getTotalTime()+interval)*1000, 1000);
-
-        titleText.setText(TITLE);
-        countText.setText(count +" / " + interval);
-        timeText.setText(TIME.get(0) + "초");
-        textView.setVisibility(View.INVISIBLE);
+        //SQLite & ArrayList 세팅
+        helper = new SQLdbHelper(this);
+        //helper.getInst(this);
+        allList = helper.loadDataList();
+        for (int i = 0; i < allList.size(); i++) {
+            titleList.add(((allList.get(i)).get(0)).split(",")[0]);
+        }
 
 
-        View.OnClickListener btnClick = new View.OnClickListener() {
+        //리사이클러뷰 세팅
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new Adapter(titleList, this);
+        recyclerView.setAdapter(adapter);
+
+        View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (v.getId()){
-                    case R.id.startBtn:
-                        count = 1;
-                        i = 0;
-                        time = TIME.get(i);
-                        myTimer.start();
+                switch (v.getId()) {
+                    case R.id.newBtn:
+                        editTexts = new ArrayList<>();
+                        time_layout.removeAllViews();
+                        add_layout.setVisibility(View.VISIBLE);
                         break;
-                    case R.id.listBtn:
-                        myTimer.cancel();
-                        Intent intent = new Intent(MainActivity.this, TimerListActivity.class);
-                        startActivity(intent);
+                    case R.id.addTimerBtn:
+                        timeTextView();
+                        break;
+                    case R.id.saveBtn:
+                        add_layout.setVisibility(View.GONE);
+                        String title = title_editText.getText().toString();
+                        ArrayList<String> data = new ArrayList<>();
+                        for (int i = 0; i < editTexts.size(); i++) {
+                            if (editTexts.get(i).length() != 0)
+                                data.add(editTexts.get(i).getText().toString());
+                        }
+                        if (data.size() > 0 && title.length() > 0) {
+                            String line = title + ",";
+                            for (int i = 0; i < data.size(); i++) {
+                                line = line + data.get(i) + ",";
+                            }
+                            titleList.add(title);
+                            allList.add(data);
+                            helper.insertData(line);
+                            adapter.notifyDataSetChanged();
+                        }
+                        add_layout.setVisibility(View.GONE);
                 }
             }
         };
-        startBtn.setOnClickListener(btnClick);
-        listBtn.setOnClickListener(btnClick);
-    }
+        newBtn.setOnClickListener(onClickListener);
+        addTimerBtn.setOnClickListener(onClickListener);
+        saveBtn.setOnClickListener(onClickListener);
 
-    public int getTotalTime(){
-        int sum=0;
-        for(int i=0; i<COUNT; i++){
-            sum += TIME.get(i);
-        }
-        return sum;
-    }
-
-    public class MyTimer extends CountDownTimer{
-        public MyTimer(long millis, long countDownInterval){
-            super(millis, countDownInterval);
-        }
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-            timeText.setText(time + "초");
-            time--;
-            try{
-                if(time==-1){
-                    i++;
-                    time = TIME.get(i);
-                    if(i%2==0){
-                        count++;
-                        countText.setText(count +" / " + interval);
-                    }else {
-                        Log.d("세트: ", count + ", 휴식");
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(Adapter.Holder holder, View view, int position) {
+                Log.d("아이템 클릭함",position + "");
+                String item = adapter.getItem(position);
+                String line = "";
+                for (int j=0; j<titleList.size(); j++){
+                    if(titleList.get(j).equals(item)){
+                        for(int i=0; i<allList.get(j).size(); i++){
+                            line = line + (allList.get(j)).get(i)+",";
+                        }
+                        break;
                     }
-                    soundPool.play(sound, 1f,1f,0,0,1f);
                 }
-            }catch (Exception e){
-                e.printStackTrace();
+                SharedPreferences pref = getSharedPreferences("Pref", MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString("timer",line);
+                editor.commit();
+                Log.d("*pref의 data에 ", line+"을 저장함");
+                Intent intent = new Intent(MainActivity.this, TimerActivity.class);
+                startActivity(intent);
             }
-        }
 
-        @Override
-        public void onFinish() {
-            timeText.setText("끝!");
-        }
+            @Override
+            public boolean onLongItemClick(Adapter.Holder holder, View view, int position) {
+                Log.d("아이템 길게 클릭함",position+"");
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage("삭제하시겠습니까?");
+                builder.setPositiveButton("네", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String item = adapter.getItem(position);
+                        String line = "";
+                        for (int j=0; j<titleList.size(); j++){
+                            if(titleList.get(j).equals(item)){
+                                for(int i=0; i<allList.get(j).size();i++){
+                                    line = line +(allList.get(j)).get(i)+",";
+                                }
+                                break;
+                            }
+                        }
+                        titleList.remove(position);
+                        allList.remove(position);
+                        helper.deleteData(line);
+                        adapter.notifyDataSetChanged();
+                        Log.d("크기", titleList.size() +","+allList.size());
+                    }
+                });
+                builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
+                return true;
+                //adapter.notifyItemRemoved(position);
+                //adapter.notifyItemRangeChanged(position, titleList.size());
+            }
+        });
     }
 
-    public void initData(){
-        String lastPicked_data = pref.getString("timer", "");
-        Log.d("**pref data",lastPicked_data);
-        if(lastPicked_data.length()<0){
-            TITLE = "플랭크";
-            TIME.add(30);
-            TIME.add(10);
-            TIME.add(40);
-            TIME.add(10);
-            TIME.add(50);
-            TIME.add(10);
-            TIME.add(60);
-        }else {
-            String [] splits = lastPicked_data.split(",");
-            TITLE = splits[0];
-            for (int i=1; i<splits.length;i++){
-                TIME.add(Integer.parseInt(splits[i]));
-            }
-        }
+    //EditText(타이머) 만들기
+    public void timeTextView() {
+        EditText myText = new EditText(this);
+        myText.setTextColor(Color.BLACK);
+        myText.setTextSize(18);
+        myText.setHint("타이머 시간");
+        myText.setHintTextColor(Color.LTGRAY);
+        myText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        myText.setLayoutParams(lp);
+        editTexts.add(myText);
+        time_layout.addView(myText);
     }
 }
