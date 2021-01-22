@@ -1,5 +1,7 @@
 package com.tlatla.extimer;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.BufferedReader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,10 +25,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView titleText;
     private TextView timeText;
     private Button startBtn;
+    private Button listBtn;
+
+    private SharedPreferences pref;
 
     private ArrayList<Integer> TIME = new ArrayList<>();
     private int COUNT;
-    private String TITLE = "플랭크";
+    private String TITLE;
     private MyTimer myTimer;
 
     private SoundPool soundPool;
@@ -49,16 +55,13 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
         timeText = findViewById(R.id.timeText);
         startBtn = findViewById(R.id.startBtn);
+        listBtn = findViewById(R.id.listBtn);
 
-        //
-        TIME.add(5);
-        TIME.add(3);
-        TIME.add(5);
-        TIME.add(3);
-        TIME.add(5);
-        TIME.add(1);
+        pref = getSharedPreferences("Pref", MODE_PRIVATE);
+        initData();
+
+
         COUNT = TIME.size();
-        //
         interval = (int)Math.round((COUNT+0.3)/2);
 
         myTimer = new MyTimer((getTotalTime()+interval)*1000, 1000);
@@ -79,10 +82,15 @@ public class MainActivity extends AppCompatActivity {
                         time = TIME.get(i);
                         myTimer.start();
                         break;
+                    case R.id.listBtn:
+                        myTimer.cancel();
+                        Intent intent = new Intent(MainActivity.this, TimerListActivity.class);
+                        startActivity(intent);
                 }
             }
         };
         startBtn.setOnClickListener(btnClick);
+        listBtn.setOnClickListener(btnClick);
     }
 
     public int getTotalTime(){
@@ -115,13 +123,34 @@ public class MainActivity extends AppCompatActivity {
                     soundPool.play(sound, 1f,1f,0,0,1f);
                 }
             }catch (Exception e){
-                Log.d("상태 - ", "타이머 종료");
+                e.printStackTrace();
             }
         }
 
         @Override
         public void onFinish() {
             timeText.setText("끝!");
+        }
+    }
+
+    public void initData(){
+        String lastPicked_data = pref.getString("timer", "");
+        Log.d("**pref data",lastPicked_data);
+        if(lastPicked_data.length()<0){
+            TITLE = "플랭크";
+            TIME.add(30);
+            TIME.add(10);
+            TIME.add(40);
+            TIME.add(10);
+            TIME.add(50);
+            TIME.add(10);
+            TIME.add(60);
+        }else {
+            String [] splits = lastPicked_data.split(",");
+            TITLE = splits[0];
+            for (int i=1; i<splits.length;i++){
+                TIME.add(Integer.parseInt(splits[i]));
+            }
         }
     }
 }
