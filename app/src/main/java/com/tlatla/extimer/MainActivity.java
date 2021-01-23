@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<EditText> editTexts;
     private SQLdbHelper helper;
 
-
+                                                //TODO: 예쁘게 !, 수정기능도 있으면 좋긴할텐데...
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
                         add_layout.setVisibility(View.VISIBLE);
                         break;
                     case R.id.addTimerBtn:
-                        timeTextView();
+                        //timeTextView();
+                        timerView();
                         break;
                     case R.id.saveBtn:
                         add_layout.setVisibility(View.GONE);
@@ -124,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putString("timer",line);
                 editor.commit();
-                Log.d("*pref의 data에 ", line+"을 저장함");
                 Intent intent = new Intent(MainActivity.this, TimerActivity.class);
                 startActivity(intent);
             }
@@ -151,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
                         allList.remove(position);
                         helper.deleteData(line);
                         adapter.notifyDataSetChanged();
-                        Log.d("크기", titleList.size() +","+allList.size());
                     }
                 });
                 builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
@@ -162,23 +161,31 @@ public class MainActivity extends AppCompatActivity {
                 });
                 builder.show();
                 return true;
-                //adapter.notifyItemRemoved(position);
-                //adapter.notifyItemRangeChanged(position, titleList.size());
             }
         });
     }
 
-    //EditText(타이머) 만들기
-    public void timeTextView() {
+    //타이머 추가
+    public void timerView(){
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.addView(newEditText("단계", InputType.TYPE_CLASS_TEXT));
+        layout.addView(newEditText("타이머 시간", InputType.TYPE_CLASS_NUMBER));
+        layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        time_layout.addView(layout);
+    }
+
+    public EditText newEditText(String hint, int inputType){
         EditText myText = new EditText(this);
         myText.setTextColor(Color.BLACK);
         myText.setTextSize(18);
-        myText.setHint("타이머 시간");
+        myText.setHint(hint);
         myText.setHintTextColor(Color.LTGRAY);
-        myText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        myText.setInputType(inputType);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         myText.setLayoutParams(lp);
         editTexts.add(myText);
-        time_layout.addView(myText);
+
+        return myText;
     }
 }
