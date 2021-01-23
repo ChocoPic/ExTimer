@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<EditText> editTexts;
     private SQLdbHelper helper;
 
-                                                //TODO: 예쁘게 !, 수정기능도 있으면 좋긴할텐데...
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,10 +56,9 @@ public class MainActivity extends AppCompatActivity {
 
         //SQLite & ArrayList 세팅
         helper = new SQLdbHelper(this);
-        //helper.getInst(this);
         allList = helper.loadDataList();
         for (int i = 0; i < allList.size(); i++) {
-            titleList.add(((allList.get(i)).get(0)).split(",")[0]);
+            titleList.add(allList.get(i).get(0).split(",")[0]);
         }
 
 
@@ -78,28 +77,35 @@ public class MainActivity extends AppCompatActivity {
                         add_layout.setVisibility(View.VISIBLE);
                         break;
                     case R.id.addTimerBtn:
-                        //timeTextView();
                         timerView();
                         break;
                     case R.id.saveBtn:
-                        add_layout.setVisibility(View.GONE);
-                        String title = title_editText.getText().toString();
-                        ArrayList<String> data = new ArrayList<>();
-                        for (int i = 0; i < editTexts.size(); i++) {
-                            if (editTexts.get(i).length() != 0)
-                                data.add(editTexts.get(i).getText().toString());
-                        }
-                        if (data.size() > 0 && title.length() > 0) {
-                            String line = title + ",";
-                            for (int i = 0; i < data.size(); i++) {
-                                line = line + data.get(i) + ",";
+                        //제목을 가져옴
+                        String title = String.valueOf(title_editText.getText());
+                        String line = "";
+                        if (title==null && title.equals("")) {
+                            Toast.makeText(MainActivity.this,"제목을 입력해주세요",Toast.LENGTH_LONG).show();
+                        }else {
+                            ArrayList<String> data = new ArrayList<>();
+                            line += title;
+                            data.add(title);
+                            //단계와 시간을 가져옴
+                            for (EditText et : editTexts){
+                                if (et.getText()==null || et.getText().toString().equals("")){
+                                    Toast.makeText(MainActivity.this,"빈칸이 있어요",Toast.LENGTH_LONG).show();
+                                    break;
+                                }
+                                else {
+                                    line =  line + String.valueOf(et.getText())+"," ;
+                                    data.add(et.getText().toString());
+                                }
                             }
+                            helper.insertData(line);
                             titleList.add(title);
                             allList.add(data);
-                            helper.insertData(line);
                             adapter.notifyDataSetChanged();
+                            add_layout.setVisibility(View.GONE);
                         }
-                        add_layout.setVisibility(View.GONE);
                 }
             }
         };
@@ -112,27 +118,29 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(Adapter.Holder holder, View view, int position) {
                 Log.d("아이템 클릭함",position + "");
                 String item = adapter.getItem(position);
-                String line = "";
-                for (int j=0; j<titleList.size(); j++){
-                    if(titleList.get(j).equals(item)){
-                        for(int i=0; i<allList.get(j).size(); i++){
-                            line = line + (allList.get(j)).get(i)+",";
+                String temp_line = "";
+                int clickedIndex = 0;
+                for (String title : titleList){
+                    if (title.equals(item)){
+                        ArrayList<String> temp = allList.get(clickedIndex);
+                        for (int k=0; k<temp.size(); k++){
+                            temp_line = temp_line + temp.get(k) + ",";
                         }
-                        break;
-                    }
+                    } clickedIndex++;
                 }
                 SharedPreferences pref = getSharedPreferences("Pref", MODE_PRIVATE);
                 SharedPreferences.Editor editor = pref.edit();
-                editor.putString("timer",line);
+                editor.putString("timer",temp_line);
                 editor.commit();
                 Intent intent = new Intent(MainActivity.this, TimerActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
 
             @Override
             public boolean onLongItemClick(Adapter.Holder holder, View view, int position) {
                 Log.d("아이템 길게 클릭함",position+"");
-                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("삭제하시겠습니까?");
                 builder.setPositiveButton("네", new DialogInterface.OnClickListener() {
                     @Override

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class SQLdbHelper extends SQLiteOpenHelper {
 
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
     public static final String DB_NAME = "timer.db";
     public static final String TABLE_NAME = "timer_table";
     public static final String COLUMN_DATA = "timer_data";
@@ -66,7 +66,6 @@ public class SQLdbHelper extends SQLiteOpenHelper {
     }
     //삭제
     public void deleteData(String data) {
-        System.out.println("삭제하기 " + data);
         int id = getID_fromData(data);
         db.delete(TABLE_NAME, COLUMN_DATA + "=? and "
                 + COLUMN_ID + "=?", new String[]{data, String.valueOf(id)});
@@ -84,13 +83,11 @@ public class SQLdbHelper extends SQLiteOpenHelper {
     }
 
     public int getID_fromData(String data) {
-        System.out.println("삭제 또는 수정할 내용은: " + data);
         Cursor cursor = db.query(TABLE_NAME, new String[]{COLUMN_ID}, COLUMN_DATA + "=?", new String[]{String.valueOf(data)}, null, null, null);
         int id = 0;
         while (cursor.moveToNext()) {
             int column = cursor.getColumnIndex(COLUMN_ID);
             id = cursor.getInt(column);
-            System.out.println(data + " 의 id는 " + id);
         }
         cursor.close();
         return id;
@@ -98,19 +95,17 @@ public class SQLdbHelper extends SQLiteOpenHelper {
 
     public ArrayList<ArrayList<String>> loadDataList(){
         ArrayList<ArrayList<String>> datas = new ArrayList<>();
-        int cnt=0;
         try {
             Cursor c = getAllData();
             if(c.moveToFirst()){
                 do{
                     ArrayList<String> data = new ArrayList<>();
                     String [] splits = (c.getString(1)).split(",");
-                    for(int i=0; i<splits.length;i++){
-                        data.add(splits[i]);
+                    for(String s: splits){
+                        data.add(s);
                     }
                     Log.d("** db 내용",c. getInt(0) +" "+ data);
                     datas.add(data);
-                    cnt++;
                 }while (c.moveToNext());
             }
             c.close();
