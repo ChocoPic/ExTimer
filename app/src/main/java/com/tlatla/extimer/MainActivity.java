@@ -9,6 +9,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -18,17 +19,19 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    private final static String TOKEN = "@";
     private final String FILE_NAME = "timer.list";
     private RecyclerView recyclerView;
     private Adapter adapter;
     private ArrayList<String> titleList = new ArrayList<>();    //리사이클러뷰 출력용 (제목)
-    private ArrayList<ArrayList<String>> allList;  //파일 저장용 (제목+시간)
+    private ArrayList<String> allList;  //파일 저장용 (제목+시간)
 
     private Button newBtn;
     private Button addTimerBtn;
@@ -58,9 +61,9 @@ public class MainActivity extends AppCompatActivity {
         helper = new SQLdbHelper(this);
         allList = helper.loadDataList();
         for (int i = 0; i < allList.size(); i++) {
-            titleList.add(allList.get(i).get(0).split(",")[0]);
+            String [] splits = allList.get(i).split(TOKEN);
+            titleList.add(splits[0]);
         }
-
 
         //리사이클러뷰 세팅
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -81,30 +84,33 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.saveBtn:
                         //제목을 가져옴
+                        Boolean blank = true;
                         String title = String.valueOf(title_editText.getText());
                         String line = "";
-                        if (title==null && title.equals("")) {
-                            Toast.makeText(MainActivity.this,"제목을 입력해주세요",Toast.LENGTH_LONG).show();
-                        }else {
-                            ArrayList<String> data = new ArrayList<>();
-                            line += title;
-                            data.add(title);
+                        if (title == null || title.equals("")) {
+                            Toast.makeText(MainActivity.this, "제목을 입력해주세요", Toast.LENGTH_LONG).show();
+                        } else {
+                            line =  line + title + TOKEN;
                             //단계와 시간을 가져옴
-                            for (EditText et : editTexts){
-                                if (et.getText()==null || et.getText().toString().equals("")){
-                                    Toast.makeText(MainActivity.this,"빈칸이 있어요",Toast.LENGTH_LONG).show();
+                            for (EditText et : editTexts) {
+                                if (et.getText().toString() == null || et.getText().toString().equals("")) {
+                                    Toast.makeText(MainActivity.this, "빈칸이 있어요", Toast.LENGTH_LONG).show();
+                                    blank = true;
                                     break;
-                                }
-                                else {
-                                    line =  line + String.valueOf(et.getText())+"," ;
-                                    data.add(et.getText().toString());
+                                } else {
+                                    line = line + et.getText().toString() + TOKEN;
+                                    blank = false;
                                 }
                             }
-                            helper.insertData(line);
-                            titleList.add(title);
-                            allList.add(data);
-                            adapter.notifyDataSetChanged();
-                            add_layout.setVisibility(View.GONE);
+                            if (!blank) {
+                                helper.insertData(line);
+                                allList.add(line);  //
+                                titleList.add(title);
+                                adapter.notifyDataSetChanged();
+                                add_layout.setVisibility(View.GONE);
+                                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(editTexts.get(editTexts.size() - 1).getWindowToken(), 0);
+                            }
                         }
                 }
             }
@@ -116,21 +122,16 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(Adapter.Holder holder, View view, int position) {
-                Log.d("아이템 클릭함",position + "");
+                Log.d("아이템 클릭함", position + "");
                 String item = adapter.getItem(position);
-                String temp_line = "";
                 int clickedIndex = 0;
-                for (String title : titleList){
-                    if (title.equals(item)){
-                        ArrayList<String> temp = allList.get(clickedIndex);
-                        for (int k=0; k<temp.size(); k++){
-                            temp_line = temp_line + temp.get(k) + ",";
-                        }
-                    } clickedIndex++;
+                for (String title : titleList) {
+                    if (title.equals(item)) break;
+                    clickedIndex++;
                 }
                 SharedPreferences pref = getSharedPreferences("Pref", MODE_PRIVATE);
                 SharedPreferences.Editor editor = pref.edit();
-                editor.putString("timer",temp_line);
+                editor.putString("timer", allList.get(clickedIndex));
                 editor.commit();
                 Intent intent = new Intent(MainActivity.this, TimerActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -139,33 +140,27 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onLongItemClick(Adapter.Holder holder, View view, int position) {
-                Log.d("아이템 길게 클릭함",position+"");
+                Log.d("아이템 길게 클릭함", position + "");
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("삭제하시겠습니까?");
                 builder.setPositiveButton("네", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String item = adapter.getItem(position);
-                        String line = "";
-                        for (int j=0; j<titleList.size(); j++){
-                            if(titleList.get(j).equals(item)){
-                                for(int i=0; i<allList.get(j).size();i++){
-                                    line = line +(allList.get(j)).get(i)+",";
-                                }
-                                break;
-                            }
+                        int clickedIndex = 0;
+                        for (String title : titleList) {
+                            if (title.equals(item)) break;
+                            clickedIndex++;
                         }
                         titleList.remove(position);
                         allList.remove(position);
-                        helper.deleteData(line);
+                        helper.deleteData(allList.get(clickedIndex));
                         adapter.notifyDataSetChanged();
                     }
                 });
                 builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
+                    public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }
                 });
                 builder.show();
                 return true;
@@ -183,17 +178,17 @@ public class MainActivity extends AppCompatActivity {
         time_layout.addView(layout);
     }
 
-    public EditText newEditText(String hint, int inputType){
+    public EditText newEditText(String hint, int type){
         EditText myText = new EditText(this);
         myText.setTextColor(Color.BLACK);
         myText.setTextSize(18);
+        myText.setTypeface(ResourcesCompat.getFont(this, R.font.app_font));
         myText.setHint(hint);
         myText.setHintTextColor(Color.LTGRAY);
-        myText.setInputType(inputType);
+        myText.setInputType(type);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         myText.setLayoutParams(lp);
         editTexts.add(myText);
-
         return myText;
     }
 }

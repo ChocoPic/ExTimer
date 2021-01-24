@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 public class TimerActivity extends AppCompatActivity {
 
+    private final static String TOKEN = "@";
     private TextView stageText;
     private TextView titleText;
     private TextView timeText;
@@ -29,15 +30,14 @@ public class TimerActivity extends AppCompatActivity {
 
     private ArrayList<String> STAGE = new ArrayList<>();
     private ArrayList<Integer> TIME = new ArrayList<>();
-    private int COUNT;
     private String TITLE;
     private MyTimer myTimer;
 
     private SoundPool soundPool1, soundPool2;
     private int sound1, sound2;
 
-    int time;
-    int SET = 0;
+    private int time = 0;
+    private int SET = 0;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,8 +56,22 @@ public class TimerActivity extends AppCompatActivity {
         listBtn = findViewById(R.id.listBtn);
 
         pref = getSharedPreferences("Pref", MODE_PRIVATE);
+        String value = pref.getString("timer", "");
+        System.out.println("출력 " + value);
+        String [] splits = value.split(TOKEN);
+        TIME.clear(); STAGE.clear();
+        TITLE = splits[0];
+        for (int i=1; i<splits.length-1; i=i+2){
+            STAGE.add(splits[i]);
+            TIME.add(Integer.parseInt(splits[i+1]));
+        }
+        System.out.println("출력 " + TIME.size() + STAGE.size());
+        SET = 0;
+        time = TIME.get(SET);
+        titleText.setText(TITLE);
+        stageText.setText(STAGE.get(SET));
+        timeText.setText(time + "초");
 
-        initData();
 
         View.OnClickListener btnClick = new View.OnClickListener() {
             @Override
@@ -66,8 +80,9 @@ public class TimerActivity extends AppCompatActivity {
                     case R.id.startBtn:
                         SET = 0;
                         time = TIME.get(SET);
+                        titleText.setText(TITLE);
                         stageText.setText(STAGE.get(SET));
-                        timeText.setText(time + "초");
+                        timeText.setText( time +"초");
                         if (myTimer!=null) myTimer.cancel();
                         myTimer = new MyTimer(getTotalTime()*1000, 1000);
                         myTimer.start();
@@ -113,42 +128,6 @@ public class TimerActivity extends AppCompatActivity {
         public void onFinish() {
             soundPool2.play(sound2, 1f,1f,1,0,1.5f);
             timeText.setText("끝!");
-        }
-    }
-
-    public void initData(){
-        STAGE.clear();  TIME.clear();   TITLE = "";
-
-        String lastPicked_data = pref.getString("timer", "");
-        if (lastPicked_data.equals("")){
-            Toast.makeText(this,"타이머 로드 에러", Toast.LENGTH_LONG).show();
-            Log.d("에러","타이머 로드 에러");
-        }else {
-            String [] splits = lastPicked_data.split(",");
-            COUNT = (splits.length)-1;
-            int num = 0;
-            for (String str : splits){
-                if (num==0){
-                    TITLE = str;
-                }
-                else if ((num%2)==1){
-                    STAGE.add(str);
-                }
-                else if ((num%2)==0) {
-                    TIME.add(Integer.parseInt(str));
-                }
-                num++;
-            }
-
-            for (int i=0; i<TIME.size(); i++){
-                System.out.println("***" + TIME.get(i) + " " + STAGE.get(i));
-            }
-
-            titleText.setText(TITLE);
-            SET = 0;
-            time = TIME.get(SET);
-            timeText.setText(time + "초");
-            stageText.setText(STAGE.get(SET));
         }
     }
 }

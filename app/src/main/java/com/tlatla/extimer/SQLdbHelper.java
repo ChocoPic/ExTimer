@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class SQLdbHelper extends SQLiteOpenHelper {
 
-    public static final int DB_VERSION = 2;
+    public static final int DB_VERSION = 3;
     public static final String DB_NAME = "timer.db";
     public static final String TABLE_NAME = "timer_table";
     public static final String COLUMN_DATA = "timer_data";
@@ -66,9 +66,12 @@ public class SQLdbHelper extends SQLiteOpenHelper {
     }
     //삭제
     public void deleteData(String data) {
+        /*
         int id = getID_fromData(data);
         db.delete(TABLE_NAME, COLUMN_DATA + "=? and "
-                + COLUMN_ID + "=?", new String[]{data, String.valueOf(id)});
+                + COLUMN_ID + "=?", new String[]{data, String.valueOf(id)});*/
+        int id = getID_fromData(data);
+        db.delete(TABLE_NAME, COLUMN_ID + "=?", new String[]{ String.valueOf(id)});
         Toast.makeText(context, "삭제되었습니다!", Toast.LENGTH_SHORT).show();
     }
     //수정
@@ -93,19 +96,13 @@ public class SQLdbHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public ArrayList<ArrayList<String>> loadDataList(){
-        ArrayList<ArrayList<String>> datas = new ArrayList<>();
+    public ArrayList<String> loadDataList(){
+        ArrayList<String> datas = new ArrayList<>();
         try {
             Cursor c = getAllData();
             if(c.moveToFirst()){
                 do{
-                    ArrayList<String> data = new ArrayList<>();
-                    String [] splits = (c.getString(1)).split(",");
-                    for(String s: splits){
-                        data.add(s);
-                    }
-                    Log.d("** db 내용",c. getInt(0) +" "+ data);
-                    datas.add(data);
+                    datas.add(c.getString(1));
                 }while (c.moveToNext());
             }
             c.close();

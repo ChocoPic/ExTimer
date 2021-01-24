@@ -3,16 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp"
-    android:background="#FFFFFF"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:scrollbarStyle="outsideInset">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:background="#6EBEC1"
+        android:padding="10dp"
         android:text="타이머 목록"
+        android:textAppearance="@style/customfontstyle"
         android:textColor="#191919"
         android:textSize="18sp" />
 
@@ -23,7 +24,7 @@
         android:layout_gravity="fill_vertical"
         android:layout_margin="10dp"
         android:layout_weight="1"
-        android:background="#FFFFFF">
+        android:scrollbars="vertical">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -50,7 +51,9 @@
             android:layout_marginBottom="10dp"
             android:ems="10"
             android:hint="타이머 이름"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:textAppearance="@style/customfontstyle"
+            android:textSize="16sp" />
 
         <LinearLayout
             android:id="@+id/time_layout"
@@ -70,8 +73,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="타이머 추가"
+                android:textAppearance="@style/customfontstyle"
                 android:textColor="#263238"
-                app:backgroundTint="#CFD8DC" />
+                android:textSize="16sp"
+                app:backgroundTint="#EDC779" />
 
             <Button
                 android:id="@+id/saveBtn"
@@ -80,8 +85,10 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginLeft="10dp"
                 android:text="저장"
+                android:textAppearance="@style/customfontstyle"
                 android:textColor="#263238"
-                app:backgroundTint="#CFD8DC" />
+                android:textSize="16sp"
+                app:backgroundTint="#D77F6E" />
         </LinearLayout>
 
     </LinearLayout>
@@ -90,9 +97,11 @@
         android:id="@+id/newBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:background="@drawable/new_button"
         android:text="새로 만들기"
+        android:textAppearance="@style/customfontstyle"
         android:textColor="#263238"
-        app:backgroundTint="#00ACC1" />
+        app:backgroundTint="#6EBEC1" />
 
 </LinearLayout>
