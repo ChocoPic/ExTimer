@@ -2,6 +2,7 @@ package com.tlatla.extimer;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
@@ -86,6 +87,8 @@ public class TimerActivity extends AppCompatActivity {
                         if (myTimer!=null) myTimer.cancel();
                         myTimer = new MyTimer(getTotalTime()*1000, 1000);
                         myTimer.start();
+                        startBtn.setBackgroundColor(Color.parseColor("#D77F6E"));
+                        startBtn.setText("재시작");
                         break;
                     case R.id.listBtn:
                         if (myTimer!=null) myTimer.cancel();
@@ -128,6 +131,8 @@ public class TimerActivity extends AppCompatActivity {
         public void onFinish() {
             soundPool2.play(sound2, 1f,1f,1,0,1.5f);
             timeText.setText("끝!");
+            startBtn.setBackgroundColor(Color.parseColor("#EDC779"));
+            startBtn.setText("시작");
         }
     }
 }

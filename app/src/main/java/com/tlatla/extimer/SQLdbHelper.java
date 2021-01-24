@@ -66,12 +66,9 @@ public class SQLdbHelper extends SQLiteOpenHelper {
     }
     //삭제
     public void deleteData(String data) {
-        /*
         int id = getID_fromData(data);
         db.delete(TABLE_NAME, COLUMN_DATA + "=? and "
-                + COLUMN_ID + "=?", new String[]{data, String.valueOf(id)});*/
-        int id = getID_fromData(data);
-        db.delete(TABLE_NAME, COLUMN_ID + "=?", new String[]{ String.valueOf(id)});
+                + COLUMN_ID + "=?", new String[]{data, String.valueOf(id)});
         Toast.makeText(context, "삭제되었습니다!", Toast.LENGTH_SHORT).show();
     }
     //수정
@@ -103,6 +100,7 @@ public class SQLdbHelper extends SQLiteOpenHelper {
             if(c.moveToFirst()){
                 do{
                     datas.add(c.getString(1));
+                    Log.d("***db불러오기 ", c.getInt(0) + ":" + c.getString(1));
                 }while (c.moveToNext());
             }
             c.close();

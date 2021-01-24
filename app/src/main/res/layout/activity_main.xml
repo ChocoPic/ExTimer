@@ -11,11 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#6EBEC1"
-        android:padding="10dp"
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
         android:text="타이머 목록"
         android:textAppearance="@style/customfontstyle"
         android:textColor="#191919"
-        android:textSize="18sp" />
+        android:textSize="20sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
@@ -38,6 +41,18 @@
         android:layout_marginRight="10dp"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/closeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:gravity="right"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="x"
+            android:textColor="#818181"
+            android:textSize="16sp" />
+
         <View
             android:id="@+id/view"
             android:layout_width="match_parent"
@@ -48,12 +63,13 @@
             android:id="@+id/title_editText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"
             android:ems="10"
             android:hint="타이머 이름"
             android:inputType="textPersonName"
             android:textAppearance="@style/customfontstyle"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
 
         <LinearLayout
             android:id="@+id/time_layout"
@@ -75,7 +91,7 @@
                 android:text="타이머 추가"
                 android:textAppearance="@style/customfontstyle"
                 android:textColor="#263238"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 app:backgroundTint="#EDC779" />
 
             <Button
@@ -87,7 +103,7 @@
                 android:text="저장"
                 android:textAppearance="@style/customfontstyle"
                 android:textColor="#263238"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 app:backgroundTint="#D77F6E" />
         </LinearLayout>
 
@@ -102,6 +118,7 @@
         android:text="새로 만들기"
         android:textAppearance="@style/customfontstyle"
         android:textColor="#263238"
+        android:textSize="18sp"
         app:backgroundTint="#6EBEC1" />
 
 </LinearLayout>

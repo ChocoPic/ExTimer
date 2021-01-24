@@ -20,15 +20,18 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.Holder> {
     private ArrayList<String> list;
+    private ArrayList<String> sublist;
     private Context context;
     private OnItemClickListener listener;
 
     public class Holder extends RecyclerView.ViewHolder{
         TextView textView;
+        TextView timeText;
 
         public Holder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.list_textView);
+            timeText = itemView.findViewById(R.id.list_timeText);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -52,9 +55,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.Holder> {
         }
     }
 
-    Adapter(ArrayList<String> list, Context context){
+    Adapter(ArrayList<String> list, ArrayList<String>sublist, Context context){
         this.context = context;
         this.list = list;
+        this.sublist = sublist;
     }
 
     @NonNull
@@ -69,6 +73,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.Holder> {
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
         holder.textView.setText(list.get(position));
+        holder.timeText.setText(sublist.get(position));
     }
 
     @Override

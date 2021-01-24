@@ -32,7 +32,9 @@ public class MainActivity extends AppCompatActivity {
     private Adapter adapter;
     private ArrayList<String> titleList = new ArrayList<>();    //리사이클러뷰 출력용 (제목)
     private ArrayList<String> allList;  //파일 저장용 (제목+시간)
+    private ArrayList<String> timeList = new ArrayList<>(); //시간 예쁘게 저장용
 
+    private TextView closeBtn;
     private Button newBtn;
     private Button addTimerBtn;
     private Button saveBtn;
@@ -50,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         //뷰 세팅
         recyclerView = findViewById(R.id.recyclerview);
         add_layout = findViewById(R.id.add_layout);
+        closeBtn = findViewById(R.id.closeBtn);
         newBtn = findViewById(R.id.newBtn);
         addTimerBtn = findViewById(R.id.addTimerBtn);
         saveBtn = findViewById(R.id.saveBtn);
@@ -61,13 +64,19 @@ public class MainActivity extends AppCompatActivity {
         helper = new SQLdbHelper(this);
         allList = helper.loadDataList();
         for (int i = 0; i < allList.size(); i++) {
+            String s_time = "";
             String [] splits = allList.get(i).split(TOKEN);
             titleList.add(splits[0]);
+            for (int j=1; j<splits.length-1; j=j+2){
+                s_time = s_time + splits[j] +"("+splits[j+1]+"초) - ";
+            }
+            s_time = s_time.substring(0, s_time.length()-3);
+            timeList.add(s_time);
         }
 
         //리사이클러뷰 세팅
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new Adapter(titleList, this);
+        adapter = new Adapter(titleList, timeList, this);
         recyclerView.setAdapter(adapter);
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -77,7 +86,13 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.newBtn:
                         editTexts = new ArrayList<>();
                         time_layout.removeAllViews();
+                        title_editText.setText("");
                         add_layout.setVisibility(View.VISIBLE);
+                        newBtn.setVisibility(View.GONE);
+                        break;
+                    case R.id.closeBtn:
+                        add_layout.setVisibility(View.GONE);
+                        newBtn.setVisibility(View.VISIBLE);
                         break;
                     case R.id.addTimerBtn:
                         timerView();
@@ -86,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                         //제목을 가져옴
                         Boolean blank = true;
                         String title = String.valueOf(title_editText.getText());
-                        String line = "";
+                        String line = "";   String line2 = "";
                         if (title == null || title.equals("")) {
                             Toast.makeText(MainActivity.this, "제목을 입력해주세요", Toast.LENGTH_LONG).show();
                         } else {
@@ -103,11 +118,18 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                             if (!blank) {
+                                String [] splits = line.split(TOKEN);
+                                for (int j=1; j<splits.length-1; j=j+2){
+                                    line2 = line2 + splits[j] +"("+splits[j+1]+"초) - ";
+                                }
+                                line2 = line2.substring(0, line2.length()-3);
                                 helper.insertData(line);
                                 allList.add(line);  //
                                 titleList.add(title);
+                                timeList.add(line2);
                                 adapter.notifyDataSetChanged();
                                 add_layout.setVisibility(View.GONE);
+                                newBtn.setVisibility(View.VISIBLE);
                                 InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                                 imm.hideSoftInputFromWindow(editTexts.get(editTexts.size() - 1).getWindowToken(), 0);
                             }
@@ -118,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         newBtn.setOnClickListener(onClickListener);
         addTimerBtn.setOnClickListener(onClickListener);
         saveBtn.setOnClickListener(onClickListener);
+        closeBtn.setOnClickListener(onClickListener);
 
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
@@ -146,15 +169,9 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton("네", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String item = adapter.getItem(position);
-                        int clickedIndex = 0;
-                        for (String title : titleList) {
-                            if (title.equals(item)) break;
-                            clickedIndex++;
-                        }
-                        titleList.remove(position);
+                        helper.deleteData(allList.get(position));
                         allList.remove(position);
-                        helper.deleteData(allList.get(clickedIndex));
+                        titleList.remove(position);
                         adapter.notifyDataSetChanged();
                     }
                 });
