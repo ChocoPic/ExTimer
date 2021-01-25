@@ -5,11 +5,16 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +31,9 @@ public class TimerActivity extends AppCompatActivity {
     private TextView timeText;
     private Button startBtn;
     private Button listBtn;
+    private Switch DL_switch;
+    private LinearLayout title_layout;
+    private ImageView img;
 
     private SharedPreferences pref;
 
@@ -39,6 +47,8 @@ public class TimerActivity extends AppCompatActivity {
 
     private int time = 0;
     private int SET = 0;
+
+    private LinearLayout ll;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,6 +65,10 @@ public class TimerActivity extends AppCompatActivity {
         timeText = findViewById(R.id.timeText);
         startBtn = findViewById(R.id.startBtn);
         listBtn = findViewById(R.id.listBtn);
+        DL_switch = findViewById(R.id.switch1);
+        ll = findViewById(R.id.backgroud_layout);
+        title_layout = findViewById(R.id.title_layout);
+        img = findViewById(R.id.imageView2);
 
         pref = getSharedPreferences("Pref", MODE_PRIVATE);
         String value = pref.getString("timer", "");
@@ -100,6 +114,31 @@ public class TimerActivity extends AppCompatActivity {
         };
         startBtn.setOnClickListener(btnClick);
         listBtn.setOnClickListener(btnClick);
+
+        DL_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    //다크모드
+                    changeBarColor("#366185");
+                    title_layout.setBackgroundColor(Color.parseColor("#366185"));
+                    ll.setBackgroundColor(Color.parseColor("#3A454E"));
+                    timeText.setTextColor(Color.parseColor("#EAEAEA"));
+                    stageText.setTextColor(Color.parseColor("#818181"));
+                    titleText.setTextColor(Color.parseColor("#C1C1C1"));
+                    img.setImageResource(R.drawable.light_white);
+                }else {
+                    //라이트모드
+                    changeBarColor("#6EBEC1");
+                    title_layout.setBackgroundColor(Color.parseColor("#6EBEC1"));
+                    ll.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                    timeText.setTextColor(Color.parseColor("#000000"));
+                    stageText.setTextColor(Color.parseColor("#C1C1C1"));
+                    titleText.setTextColor(Color.parseColor("#000000"));
+                    img.setImageResource(R.drawable.light_black);
+                }
+            }
+        });
     }
 
     public int getTotalTime(){
@@ -133,6 +172,15 @@ public class TimerActivity extends AppCompatActivity {
             timeText.setText("끝!");
             startBtn.setBackgroundColor(Color.parseColor("#EDC779"));
             startBtn.setText("시작");
+        }
+    }
+    public void changeBarColor(String color){
+        View view = getWindow().getDecorView();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (view!=null){
+                view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                getWindow().setStatusBarColor(Color.parseColor(color));
+            }
         }
     }
 }
