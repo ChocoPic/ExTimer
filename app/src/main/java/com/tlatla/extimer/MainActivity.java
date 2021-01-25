@@ -100,7 +100,9 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.saveBtn:
                         //제목을 가져옴
                         Boolean blank = true;
+                        Boolean itis = false;
                         String title = String.valueOf(title_editText.getText());
+                        if (title.contains("@")) itis = true;
                         String line = "";   String line2 = "";
                         if (title == null || title.equals("")) {
                             Toast.makeText(MainActivity.this, "제목을 입력해주세요", Toast.LENGTH_LONG).show();
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                             line =  line + title + TOKEN;
                             //단계와 시간을 가져옴
                             for (EditText et : editTexts) {
+                                if (et.getText().toString().contains("@")) itis = true;
                                 if (et.getText().toString() == null || et.getText().toString().equals("")) {
                                     Toast.makeText(MainActivity.this, "빈칸이 있어요", Toast.LENGTH_LONG).show();
                                     blank = true;
@@ -117,7 +120,10 @@ public class MainActivity extends AppCompatActivity {
                                     blank = false;
                                 }
                             }
-                            if (!blank) {
+                            if (itis){
+                                Toast.makeText(MainActivity.this, "'@'는 사용할 수 없어요", Toast.LENGTH_LONG).show();
+                            }
+                            else if (!blank) {
                                 String [] splits = line.split(TOKEN);
                                 for (int j=1; j<splits.length-1; j=j+2){
                                     line2 = line2 + splits[j] +"("+splits[j+1]+"초) - ";
@@ -172,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
                         helper.deleteData(allList.get(position));
                         allList.remove(position);
                         titleList.remove(position);
+                        timeList.remove(position);
                         adapter.notifyDataSetChanged();
                     }
                 });
