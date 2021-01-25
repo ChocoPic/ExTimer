@@ -122,7 +122,7 @@ public class TimerActivity extends AppCompatActivity {
                     //다크모드
                     changeBarColor("#366185");
                     title_layout.setBackgroundColor(Color.parseColor("#366185"));
-                    ll.setBackgroundColor(Color.parseColor("#3A454E"));
+                    ll.setBackgroundColor(Color.parseColor("#2F3942"));
                     timeText.setTextColor(Color.parseColor("#EAEAEA"));
                     stageText.setTextColor(Color.parseColor("#818181"));
                     titleText.setTextColor(Color.parseColor("#C1C1C1"));
