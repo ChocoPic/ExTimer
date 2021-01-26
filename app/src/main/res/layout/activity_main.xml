@@ -11,14 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#6EBEC1"
+        android:gravity="center_vertical"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingRight="10dp"
         android:paddingBottom="10dp"
         android:text="타이머 목록"
-        android:textAppearance="@style/customfontstyle"
+        android:textAppearance="@style/customfont2"
         android:textColor="#191919"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
@@ -116,7 +117,7 @@
         android:layout_margin="10dp"
         android:background="@drawable/new_button"
         android:text="새로 만들기"
-        android:textAppearance="@style/customfontstyle"
+        android:textAppearance="@style/customfont2"
         android:textColor="#263238"
         android:textSize="18sp"
         app:backgroundTint="#6EBEC1" />

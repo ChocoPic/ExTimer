@@ -4,4 +4,8 @@
         android:fontStyle="normal"
         android:fontWeight="400"
         android:font="@font/app_font" />
+    <font
+        android:font="@font/hannaair"
+        android:fontStyle="normal"
+        android:fontWeight="400"/>
 </font-family>

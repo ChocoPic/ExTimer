@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TOKEN = "@";
-    private final String FILE_NAME = "timer.list";
     private RecyclerView recyclerView;
     private Adapter adapter;
     private ArrayList<String> titleList = new ArrayList<>();    //리사이클러뷰 출력용 (제목)
@@ -108,6 +107,12 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "제목을 입력해주세요", Toast.LENGTH_LONG).show();
                         } else {
                             line =  line + title + TOKEN;
+                            /*
+                            for (int i=0; i<time_layout.getChildCount(); i++){
+                                Object child = time_layout.getChildAt(i);
+                                if (child instanceof EditText)
+                                    editTexts.add((EditText)child);
+                            }*/
                             //단계와 시간을 가져옴
                             for (EditText et : editTexts) {
                                 if (et.getText().toString().contains("@")) itis = true;
@@ -194,12 +199,37 @@ public class MainActivity extends AppCompatActivity {
 
     //타이머 추가
     public void timerView(){
+        Button button = newButton();
+        EditText editText1 = newEditText("단계", InputType.TYPE_CLASS_TEXT);
+        EditText editText2 = newEditText("타이머 시간", InputType.TYPE_CLASS_NUMBER);
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.HORIZONTAL);
-        layout.addView(newEditText("단계", InputType.TYPE_CLASS_TEXT));
-        layout.addView(newEditText("타이머 시간", InputType.TYPE_CLASS_NUMBER));
+        layout.addView(editText1);
+        editTexts.add(editText1);
+        layout.addView(editText2);
+        editTexts.add(editText2);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layout.removeView(editText1);
+                editTexts.remove(editText1);
+                layout.removeView(editText2);
+                editTexts.remove(editText2);
+                layout.removeView(button);
+            }
+        });
         layout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         time_layout.addView(layout);
+    }
+
+    public Button newButton(){
+        Button button = new Button(this);
+        //button.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        button.setText(" x ");
+        button.setTextSize(16);
+        button.setTypeface(ResourcesCompat.getFont(this, R.font.app_font));
+        return button;
     }
 
     public EditText newEditText(String hint, int type){
@@ -212,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
         myText.setInputType(type);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         myText.setLayoutParams(lp);
-        editTexts.add(myText);
+
         return myText;
     }
 }

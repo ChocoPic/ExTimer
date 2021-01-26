@@ -4,7 +4,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.media.SoundPool;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -42,8 +46,10 @@ public class TimerActivity extends AppCompatActivity {
     private String TITLE;
     private MyTimer myTimer;
 
-    private SoundPool soundPool1, soundPool2;
-    private int sound1, sound2;
+    Uri note;
+    Ringtone ringtone;
+    SoundPool soundPool;
+    int sound;
 
     private int time = 0;
     private int SET = 0;
@@ -55,10 +61,10 @@ public class TimerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer);
 
-        soundPool1 = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-        soundPool2 = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-        sound1 = soundPool1.load(this, R.raw.bbb, 1);
-        sound2 = soundPool2.load(this, R.raw.beeep, 1);
+        soundPool = new SoundPool(1, AudioManager.STREAM_ALARM , 0);
+        sound = soundPool.load(this, R.raw.bbb, 1);
+        note = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        ringtone = RingtoneManager.getRingtone(getApplicationContext(),note);
 
         titleText = findViewById(R.id.titleText);
         stageText = findViewById(R.id.countText);
@@ -146,7 +152,7 @@ public class TimerActivity extends AppCompatActivity {
         for(int i=0; i<TIME.size(); i++){
             sum += TIME.get(i);
         }
-        return sum+TIME.size();
+        return sum+TIME.size()-1;
     }
 
     public class MyTimer extends CountDownTimer{
@@ -159,7 +165,7 @@ public class TimerActivity extends AppCompatActivity {
             time--;
             timeText.setText((time+1) + "초");
             if ((time==-1) && (SET<(TIME.size()-1))){
-                soundPool1.play(sound1, 1f,1f,1,0,1f);
+                soundPool.play(sound, 1f, 1f, 1,0,1f);
                 SET++;
                 time = TIME.get(SET);
                 stageText.setText(STAGE.get(SET));
@@ -168,7 +174,7 @@ public class TimerActivity extends AppCompatActivity {
 
         @Override
         public void onFinish() {
-            soundPool2.play(sound2, 1f,1f,1,0,1.5f);
+            ringtone.play();
             timeText.setText("끝!");
             startBtn.setBackgroundColor(Color.parseColor("#EDC779"));
             startBtn.setText("시작");

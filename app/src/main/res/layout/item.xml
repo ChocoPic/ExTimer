@@ -36,7 +36,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 android:text="TextView"
-                android:textAppearance="@style/customfontstyle"
+                android:textAppearance="@style/customfont2"
                 android:textColor="#191919"
                 android:textSize="18sp" />
 

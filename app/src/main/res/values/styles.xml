@@ -4,4 +4,7 @@
     <style name="customfontstyle" parent="@android:style/TextAppearance.Small">
         <item name="android:fontFamily">@font/app_font</item>
     </style>
+    <style name="customfont2" parent="android:style/TextAppearance.Small">
+        <item name="android:fontFamily">@font/hannaair</item>
+    </style>
 </resources>

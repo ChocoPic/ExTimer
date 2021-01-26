@@ -27,7 +27,7 @@
             android:layout_marginBottom="10dp"
             android:layout_weight="1"
             android:text="TIMER"
-            android:textAppearance="@style/customfontstyle"
+            android:textAppearance="@style/customfont2"
             android:textColor="#263238"
             android:textSize="24sp" />
 
