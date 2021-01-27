@@ -229,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
         button.setText(" x ");
         button.setTextSize(16);
         button.setTypeface(ResourcesCompat.getFont(this, R.font.app_font));
+        button.setBackground(null);
         return button;
     }
 

@@ -29,7 +29,7 @@
             android:text="TIMER"
             android:textAppearance="@style/customfont2"
             android:textColor="#263238"
-            android:textSize="24sp" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/listBtn"

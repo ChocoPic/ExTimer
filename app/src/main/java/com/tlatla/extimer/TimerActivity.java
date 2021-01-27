@@ -49,7 +49,7 @@ public class TimerActivity extends AppCompatActivity {
     Uri note;
     Ringtone ringtone;
     SoundPool soundPool;
-    int sound;
+    int sound, sound2;
 
     private int time = 0;
     private int SET = 0;
@@ -63,6 +63,7 @@ public class TimerActivity extends AppCompatActivity {
 
         soundPool = new SoundPool(1, AudioManager.STREAM_ALARM , 0);
         sound = soundPool.load(this, R.raw.bbb, 1);
+        sound2 = soundPool.load(this, R.raw.sharang, 0);
         note = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         ringtone = RingtoneManager.getRingtone(getApplicationContext(),note);
 
@@ -174,7 +175,7 @@ public class TimerActivity extends AppCompatActivity {
 
         @Override
         public void onFinish() {
-            ringtone.play();
+            soundPool.play(sound2, 1f, 1f, 1, 0, 1f);
             timeText.setText("끝!");
             startBtn.setBackgroundColor(Color.parseColor("#EDC779"));
             startBtn.setText("시작");
